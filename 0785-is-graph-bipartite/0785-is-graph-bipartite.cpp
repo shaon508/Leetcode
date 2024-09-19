@@ -1,25 +1,29 @@
 class Solution {
 public:
-    bool DFS(vector<vector<int>>& graph, vector<int>& col, int node,
-             int color) {
-        col[node] = color;
-        for (auto neighbor : graph[node]) {
-            if (col[neighbor] == 0) {
-                if (!DFS(graph, col, neighbor, 3 - color)) {
+    bool isBipartite(vector<vector<int>>& graph) {
+        int n = graph.size();
+        vector<int> vis(n, 0);
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                if (!bfs(graph, vis, i, 1))
                     return false;
-                }
-            } else if (col[neighbor] == col[node]) {
-                return false;
             }
         }
         return true;
     }
-    bool isBipartite(vector<vector<int>>& graph) {
-        int n = graph.size();
-        vector<int> col(n, 0);
-        for (int i = 0; i < n; ++i) {
-            if (col[i] == 0) {
-                if (!DFS(graph, col, i, 1)) {
+    bool bfs(vector<vector<int>>& graph, vector<int>& vis, int source,
+             int col) {
+        vis[source] = col;
+        queue<int> q;
+        q.push(source);
+        while (!q.empty()) {
+            int curr = q.front();
+            q.pop();
+            for (auto it : graph[curr]) {
+                if (!vis[it]) {
+                    vis[it] = 3 - vis[curr];
+                    q.push(it);
+                } else if (vis[it] == vis[curr]) {
                     return false;
                 }
             }
